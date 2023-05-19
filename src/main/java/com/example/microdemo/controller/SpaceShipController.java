@@ -1,14 +1,18 @@
 package com.example.microdemo.controller;
 
+import com.example.microdemo.functions.FuelDaysCalc;
 import com.example.microdemo.model.Spaceship;
 import com.example.microdemo.repository.SpaceShipRepository;
+import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.exceptions.HttpStatusException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller(value = "/spaceship")
@@ -62,5 +66,18 @@ public class SpaceShipController {
         }
         repository.delete(byId.get());
         return byId.get();
+    }
+
+    @Get("/fuel/calculator/{id}")
+    public Map<String,String> fuelEndpoint(@PathVariable Integer id){
+        Optional<Spaceship> ship = repository.findById(id);
+        if(ship.isEmpty()){
+            throw new HttpStatusException(HttpStatus.NOT_FOUND,"Spaceship not found for ID: " + id);
+        }
+        Integer fuel = ship.get().getFuel();
+        String response_data = FuelDaysCalc.calculator(fuel);
+        Map<String,String> response = new HashMap<>();
+        response.put("message", response_data);
+        return HttpResponse.status(HttpStatus.FOUND).body(response).body();
     }
 }
