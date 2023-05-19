@@ -1,0 +1,1 @@
+INSERT INTO SPACESHIP VALUES ("Black Dragon", "BD006", "Sophia", 50);

@@ -40,4 +40,9 @@ public class SpaceShipController {
 
         return repository.update(entity);
     }
+
+    @Get("/ship/")
+    public Iterable<Spaceship> getSpaceShipByMultipleQueries(@QueryValue Integer fuel, @QueryValue String captainName){
+        return repository.customQuery(fuel,captainName);
+    }
 }
