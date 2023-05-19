@@ -8,10 +8,18 @@ import io.micronaut.http.exceptions.HttpStatusException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+import java.util.Optional;
+
 @Controller(value = "/spaceship")
 @RequiredArgsConstructor
 public class SpaceShipController {
     private final SpaceShipRepository repository;
+
+    @Post("/add/spaceship/all")
+    public Iterable<Spaceship> addAllSpaceShip(@Body List<Spaceship> spaceships){
+        return repository.saveAll(spaceships);
+    }
 
     @Get("/spaceships")
     public Iterable<Spaceship> allSpaceships(){
@@ -44,5 +52,15 @@ public class SpaceShipController {
     @Get("/ship/")
     public Iterable<Spaceship> getSpaceShipByMultipleQueries(@QueryValue Integer fuel, @QueryValue String captainName){
         return repository.customQuery(fuel,captainName);
+    }
+
+    @Delete("/ship/delete/{id}")
+    public Spaceship deleteSpaceShip(@PathVariable @NonNull Integer id){
+        Optional<Spaceship> byId = repository.findById(id);
+        if(byId.isEmpty()){
+            throw new HttpStatusException(HttpStatus.NOT_FOUND,"Spaceship not found for ID: " + id);
+        }
+        repository.delete(byId.get());
+        return byId.get();
     }
 }
